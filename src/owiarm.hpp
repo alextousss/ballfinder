@@ -1,0 +1,38 @@
+#ifndef OWIARM
+#define OWIARM
+
+#include <iostream>
+#include "libowinew.hpp"
+#include "utils.hpp"
+
+#define BASE_Y_ROT_SPEED 0.2f // rad/s
+#define BASE_X_ROT_SPEED 0.2f
+#define BASE_Z_ROT_SPEED 0.2f
+
+
+
+class OwiArm {
+public:
+    OwiArm();
+    void update();
+    void setTargetOrientation(yArm::Vec3f orientation) { mBasePositionTarget = orientation; }
+    yArm::Vec3f getOrientation() { return mBasePosition; }
+    void setOrientation(yArm::Vec3f orientation) { mBasePosition = orientation; }
+    void closePince();
+    void openPince();
+    friend std::ostream& operator<<(std::ostream& os, const OwiArm& arm);
+private:
+    void _updateTheoricalBasePos();
+    void _updateCMD();
+    double _getSecondsSinceLastUpdate();
+    double _getSecondsSinceLastPinceMove();
+
+    yArm::Vec3f mBasePositionTarget;
+    yArm::Vec3f mBasePosition;
+    OwiCommander mCommander;
+    long long mLastUpdateTimestamp;
+    long long mLastPinceMoveTimestamp;
+    int mCurrentCMD[8];
+};
+
+#endif
