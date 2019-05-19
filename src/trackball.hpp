@@ -4,6 +4,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/tracking.hpp>
 
+#include <string>
 #include <list>
 #include <vector>
 

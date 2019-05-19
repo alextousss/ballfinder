@@ -30,5 +30,6 @@ private:
     CameraStreamer mStreamer;
     BallFinder mLeftFinder, mRightFinder;
     cv::Mat mBaseSrcLeft, mBaseSrcRight;
-
+    std::chrono::time_point<std::chrono::system_clock> mStartPinceShouldOpen;
+    bool mPinceShouldOpenStarted;
 };

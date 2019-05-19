@@ -20,7 +20,6 @@ BallFinder::BallFinder() {
 }
 
 void BallFinder::update(Mat & src) {
-    Mat srcGray;
     Rect2d roi;
     
     if(mTrackerInited) {
@@ -36,60 +35,63 @@ void BallFinder::update(Mat & src) {
             mTrackerInited = false;
         }
     }
+    Mat splittedSrc[3];
+    split(src, splittedSrc);
+    for(unsigned int c = 0; c < 3; c++) {
+        Mat cSrc = splittedSrc[c];
 
-    /// Convert it to gray
-    cvtColor(src, srcGray, COLOR_BGR2GRAY);
+        /// Reduce the noise so we avoid false circle detection
+        GaussianBlur(cSrc, cSrc, Size(5,5), 2, 2);
+        //medianBlur(srcGray, srcGray, 5);
+        vector<Vec3f> circles;
 
-    /// Reduce the noise so we avoid false circle detection
-    //GaussianBlur(srcGray, srcGray, Size(9,9), 2, 2);
-    imshow("base", srcGray);
-    medianBlur(srcGray, srcGray, 5);
-    vector<Vec3f> circles;
+        /// Apply the Hough Transform to find the circles
+        HoughCircles(cSrc, circles, HOUGH_GRADIENT, 1, cSrc.rows / 8, 100, 30, 10, 40);
+        #define MARGIN 25
+        bool drawed=false;
+        for (size_t i = 0; i < circles.size(); i++)
+        {
+            Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+            int radius = cvRound(circles[i][2]);
+            Mat mask = Mat::zeros(src.size(), CV_8UC1);
+            circle(mask, center, radius, Scalar(255), -1, 8, 0);
+            Mat hsvSrc;
+            cvtColor(src, hsvSrc, CV_RGB2HSV);
+            Mat channels[3];
+            split(hsvSrc, channels);
+            Vec3d mean, stddev;
+            meanStdDev(channels[0], mean, stddev, mask);
+            float val = (stddev[0] / mean[0])*100;
 
-    /// Apply the Hough Transform to find the circles
-    HoughCircles(srcGray, circles, HOUGH_GRADIENT, 1, srcGray.rows / 8, 100, 30, 10, 40);
-    #define MARGIN 25
+            //if(val > 29 && val < 35) {
+                //circle(src, center, radius, Scalar(255, 255, 255), 2, 8, 0);
+            //}
+            cout << val << endl;
+            //
+            // circle(cSrc, center, radius, Scalar(255, 0, 255), 2, 8, 0);
 
-    for (size_t i = 0; i < circles.size(); i++)
-    {
+            if(val < 2) {
+                drawed=true;
+                circle(src, center, radius, Scalar(255, 255, 255), 2, 8, 0);
+                roi=Rect2d(Point(center.x-radius-MARGIN/2, center.y-radius-MARGIN/2), Size(radius*2+MARGIN, radius*2+MARGIN));
+                mTracker->init(src,roi);
+                mTrackerInited = true;
+            }
 
-        Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-        int radius = cvRound(circles[i][2]);
-        Mat mask = Mat::zeros(src.size(), CV_8UC3);
-        circle(mask, center, radius * 0.8, Scalar(255, 255, 255), -1, 8, 0);
-        Mat hsvSrc, res;
-        cvtColor(src, hsvSrc, CV_RGB2HSV);
-        cvtColor(src, res, CV_RGB2HSV);
-        bitwise_and(mask,hsvSrc,res);
-        Mat channels[3];
-        split(res, channels);
-        imshow("masked", channels[0]);
-        Vec3d mean, stddev;
-        meanStdDev(res, mean, stddev);
-        float val = ((stddev[0] / mean[0]) / (radius))*100;
-
-        //if(val > 29 && val < 35) {
-            //circle(src, center, radius, Scalar(255, 255, 255), 2, 8, 0);
-        //}
-        cout << val << endl;
-        //
-        //waitKey(3000);
-
-        if(val < 23) {
-            circle(src, center, radius, Scalar(255, 255, 255), 2, 8, 0);
-            roi=Rect2d(Point(center.x-radius-MARGIN/2, center.y-radius-MARGIN/2), Size(radius*2+MARGIN, radius*2+MARGIN));
-            mTracker->init(src,roi);
-            mTrackerInited = true;
+        }
+        imshow("d = " + to_string(c), cSrc);
+        if(drawed) {
+           // waitKey(10000);
         }
     }
-    
+
     mPositionHistory.push_back(Ball{
         (roi.br() + roi.tl())*0.5,
         roi.width / 2
     });
 }
 
-#define ROLLING_MEDIAN_SIZE 5
+#define ROLLING_MEDIAN_SIZE 1
 
 Ball BallFinder::getBallPos() {
     if(mPositionHistory.size() < ROLLING_MEDIAN_SIZE)

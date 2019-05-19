@@ -15,6 +15,8 @@ Point midpoint(const Point& a, const Point& b) {
 BallGuider::BallGuider() : mStreamer({0, 1}) {
     namedWindow("left");
     namedWindow("right");
+    mPinceShouldOpenStarted = false;
+    mStartPinceShouldOpen = std::chrono::system_clock::now();
 }
 
 
@@ -55,7 +57,7 @@ void BallGuider::update() {
     circle(srcLeft, pos1.pos, 3, Scalar(0, 0, 255), -1, 8, 0);
     circle(srcLeft, pos2.pos, 3, Scalar(0, 255, 0), -1, 8, 0);
 
-    Point order(130, 225);
+    Point order(120, 220);
     Point ballPos = midpoint(pos1.pos, pos2.pos);
     circle(srcLeft, order, 3, Scalar(255, 0, 255), -1, 8, 0);
 
@@ -74,27 +76,42 @@ void BallGuider::update() {
         2
     );
     
+    mCommand = {0, 0, 0, 0};
 
-    if (distanceX < -10 && abs(distanceY) < 15 && norm(order-ballPos) < 20) {
-        mCommand.pince = true;
-        mCommand.z = 0;
-    } else {
-        mCommand.z = 1;
-        mCommand.pince = false;
-    }
-
-    if(abs(distanceY) < 5 && pos1.pos.x != 0 && pos2.pos.x != 0 && norm(order-ballPos) > 10 ) {
+    if(abs(distanceY) < 20 && pos1.pos.x != 0 && pos2.pos.x != 0) {
         mCommand.x = ballPos.x < order.x ? -1 : 1;
-        mCommand.y = ballPos.y < order.y ? -1 : 1;
-    } else {
-        mCommand = {0, 0, 0, 0};
+        mCommand.y = ballPos.y < order.y ? -1 : 1;  
+        if (distanceX < -10) {
+            if(norm(order-ballPos) < 10) {
+                auto end = std::chrono::system_clock::now();
+                int elapsed = std::chrono::duration_cast<std::chrono::milliseconds>
+                    (end-mStartPinceShouldOpen).count();
+                if(!mPinceShouldOpenStarted) {
+                    mPinceShouldOpenStarted = true;
+                    mStartPinceShouldOpen = std::chrono::system_clock::now();
+                }
+                if(mPinceShouldOpenStarted && elapsed > 500) {
+                    mCommand.pince = true;
+                }
+                mCommand.z = 0;
+            }
+        } else {
+            if(mPinceShouldOpenStarted) {
+                mPinceShouldOpenStarted = false;
+            }
+            if(norm(order-ballPos) < 75) {
+                mCommand.z = 1; 
+            }
+            mCommand.pince = false;
+        }
+
+        //if(norm(order-ballPos) > 10 ) {
+        //} else {
+        //    mCommand.x = 0;
+        //    mCommand.y = 0;
+        //}
     }
 
-    if (distanceX < -10 && abs(distanceY) < 15 && norm(order-ballPos) < 20) {
-        mCommand.pince = true;
-    } else {
-        mCommand.pince = false;
-    }
 
     auto end = chrono::steady_clock::now();
 
