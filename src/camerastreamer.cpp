@@ -25,8 +25,24 @@ CameraStreamer::~CameraStreamer()
 
 void CameraStreamer::captureFrame(int index)
 {
-    cout << "capture frame launch" << endl;
+    const std::string reset("\033[0m");
+    const std::string green("\033[0;32M"); 
+
     VideoCapture *capture = camera_capture[index];
+
+
+    cout << "(" << index << ") " << "set fourcc " << endl;
+    capture->set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', 'U', 'Y', 'V'));
+
+    cout << "(" << index << ") " << "set max fps " << endl;
+    capture->set(CV_CAP_PROP_FPS, 30);
+
+    cout << "(" << index << ") " << "set width " << endl;
+    capture->set(CV_CAP_PROP_FRAME_WIDTH, 320);
+
+    cout << "(" << index << ") " << "set height " << endl;
+    capture->set(CV_CAP_PROP_FRAME_HEIGHT, 240);
+
     while (true)
     {
         Mat frame;
@@ -57,18 +73,10 @@ void CameraStreamer::startMultiCapture()
         {
             int idx = camera_index[i];
             capture = new VideoCapture(idx);
-            cout << "set fourcc: " << endl;
-            capture->set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', 'U', 'Y', 'V'));
-            cout << "set max fps: " << endl;
-            capture->set(CV_CAP_PROP_FPS, 30);
-            cout << "set width: " << endl;
-            capture->set(CV_CAP_PROP_FRAME_WIDTH, 320);
-            cout << "set height: " << endl;
-            capture->set(CV_CAP_PROP_FRAME_HEIGHT, 240);
             cout << "Camera Setup: " << to_string(idx) << endl;
         }
 
-         //Put VideoCapture to the vector    
+        //Put VideoCapture to the vector
 
         camera_capture.push_back(capture);
 
@@ -81,11 +89,13 @@ void CameraStreamer::startMultiCapture()
         //Make thread instance
         t = new thread(&CameraStreamer::captureFrame, this, i);
 
-
         //Put thread to the vector
         camera_thread.push_back(t);
-
     }
+    Mat useless;
+    for(int i = 0; i < camera_count; i++)
+        while(!frame_queue[i]->try_pop(useless));
+
 }
 
 void CameraStreamer::stopMultiCapture()
