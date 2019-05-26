@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS= -Wall -ansi -pedantic -g3 -O0 -c -std=c++11  `pkg-config --cflags /home/alex/opencvinstall/installation/OpenCV-3.4/lib/pkgconfig/opencv.pc`
-LDFLAGS= -lsfml-graphics -lsfml-window -lsfml-system  -lsfml-network  `pkg-config --libs tbb` `pkg-config --libs /home/alex/opencvinstall/installation/OpenCV-3.4/lib/pkgconfig/opencv.pc` -pthread
+CFLAGS= -Wall -ansi -pedantic -g3 -O0 -c -std=c++11  `pkg-config --cflags opencv`
+LDFLAGS= -lsfml-graphics -lsfml-window -lsfml-system  -lsfml-network  `pkg-config --libs tbb` `pkg-config --libs opencv` -pthread
 EXEC=ballfinder
 SRCDIR=src
 ODIR=obj

@@ -19,7 +19,7 @@ public:
     void update(cv::Mat & frame);
     Ball getBallPos();
 private:
-    bool mTrackerInited; 
+    bool mTrackerInited;
     std::vector<Ball> mPositionHistory; //TODO: Utiliser une structure de donnée adaptée
     cv::Ptr<cv::TrackerCSRT> mTracker;
 };

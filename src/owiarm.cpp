@@ -13,10 +13,10 @@ OwiArm::OwiArm() {
 
 void OwiArm::_updateTheoricalBasePos() {
     if(mCurrentCMD[0] == -1) {
-        mBasePosition.x += _getSecondsSinceLastUpdate() * BASE_X_ROT_SPEED;
+        // mBasePosition.x += _getSecondsSinceLastUpdate() * BASE_X_ROT_SPEED;
     }
     if(mCurrentCMD[0] == 1) {
-        mBasePosition.x -= _getSecondsSinceLastUpdate() * BASE_X_ROT_SPEED;
+        // mBasePosition.x -= _getSecondsSinceLastUpdate() * BASE_X_ROT_SPEED;
     }
     if(mCurrentCMD[1] == -1) {
         mBasePosition.y += _getSecondsSinceLastUpdate() * BASE_Y_ROT_SPEED / 1.5;
@@ -25,10 +25,10 @@ void OwiArm::_updateTheoricalBasePos() {
         mBasePosition.y -= _getSecondsSinceLastUpdate() * BASE_Y_ROT_SPEED / 2.5;
     }
     if(mCurrentCMD[3] == -1) {
-        mBasePosition.z += _getSecondsSinceLastUpdate() * BASE_Z_ROT_SPEED;
+        // mBasePosition.z += _getSecondsSinceLastUpdate() * BASE_Z_ROT_SPEED;
     }
     if(mCurrentCMD[3] == 1) {
-        mBasePosition.z -= _getSecondsSinceLastUpdate() * BASE_Z_ROT_SPEED;
+        // mBasePosition.z -= _getSecondsSinceLastUpdate() * BASE_Z_ROT_SPEED;
     }
 
     mLastUpdateTimestamp = getMicrotime();
@@ -67,6 +67,8 @@ void OwiArm::_updateCMD() {
         mCurrentCMD[2] = 0;
     }
     mCommander.setCMD(mCurrentCMD);
+    mCommander.getOrientationValues(&mBasePosition.x, &mBasePosition.z);
+    cout << "x: " << mBasePosition.x << "\ty: " << mBasePosition.z << endl;
 }
 
 double OwiArm::_getSecondsSinceLastUpdate() {

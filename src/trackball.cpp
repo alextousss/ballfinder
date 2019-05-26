@@ -17,11 +17,12 @@ bool compareDists(const pair<int, int>&i, const pair<int, int>&j)
 
 BallFinder::BallFinder() {
     mTracker = TrackerCSRT::create();
+    mTrackerInited = false;
 }
 
 void BallFinder::update(Mat & src) {
     Rect2d roi;
-    
+
     if(mTrackerInited) {
         if(!mTracker->update(src, roi)) {
             cout << "fail " << endl;

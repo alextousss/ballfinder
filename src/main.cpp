@@ -13,7 +13,6 @@ using namespace std;
 
 int main(int argc, char **argv) {
     auto lastArmUpdate = chrono::steady_clock::now();
-
     BallGuider guider;
     OwiArm arm;
     bool pinceOpen = false;
@@ -39,7 +38,13 @@ int main(int argc, char **argv) {
             }
             arm.setTargetOrientation(nextTarget);
 
+
+            auto start = chrono::steady_clock::now();
             arm.update();
+            auto end = chrono::steady_clock::now();
+            cout << "Time to update : "
+                << chrono::duration_cast<chrono::milliseconds>(end - start).count()
+                << " ms" << endl;
         }
 
 
