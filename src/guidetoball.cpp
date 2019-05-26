@@ -13,8 +13,8 @@ Point midpoint(const Point& a, const Point& b) {
 
 
 BallGuider::BallGuider() : mStreamer({1, 2}) {
-    namedWindow("left");
-    namedWindow("right");
+    //namedWindow("left");
+    //namedWindow("right");
     mPinceShouldOpenStarted = false;
     mStartPinceShouldOpen = std::chrono::system_clock::now();
 }
@@ -50,7 +50,6 @@ void BallGuider::update() {
 
     flip(srcLeft, srcLeft, 0);
     flip(srcLeft, srcLeft, +1);
-
     mLeftFinder.update(srcLeft);
     mRightFinder.update(srcRight);
     Ball pos1 = mLeftFinder.getBallPos();
@@ -82,7 +81,7 @@ void BallGuider::update() {
     if(abs(distanceY) < 20 && pos1.pos.x != 0 && pos2.pos.x != 0) {
         mCommand.x = ballPos.x < order.x ? -1 : 1;
         mCommand.y = ballPos.y < order.y ? -1 : 1;
-        if (distanceX < -10) {
+        if (distanceX < -20) {
             if(norm(order-ballPos) < 10) {
                 auto end = std::chrono::system_clock::now();
                 int elapsed = std::chrono::duration_cast<std::chrono::milliseconds>
@@ -115,17 +114,20 @@ void BallGuider::update() {
         //}
     }
 
+    if(distanceX != 0) {
+        cout << "d = " << distanceX << endl;
+    }
 
     auto end = chrono::steady_clock::now();
 
-    if(waitKey(1) >= 0) exit(0);
+//    if(waitKey(1) >= 0) exit(0);
 
-    cout << "Elapsed time in ms : "
+/*    cout << "Elapsed time in ms : "
         << chrono::duration_cast<chrono::milliseconds>(end - start).count()
         << " ms" << endl;
-
+*/
     /// Show your results
-    imshow("left", srcLeft);
-    imshow("right", srcRight);
+    //imshow("left", srcLeft);
+    //imshow("right", srcRight);
 
 }

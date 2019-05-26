@@ -40,7 +40,6 @@ void BallFinder::update(Mat & src) {
     split(src, splittedSrc);
     for(unsigned int c = 0; c < 3; c++) {
         Mat cSrc = splittedSrc[c];
-
         /// Reduce the noise so we avoid false circle detection
         GaussianBlur(cSrc, cSrc, Size(5,5), 2, 2);
         //medianBlur(srcGray, srcGray, 5);
@@ -67,10 +66,9 @@ void BallFinder::update(Mat & src) {
             //if(val > 29 && val < 35) {
                 //circle(src, center, radius, Scalar(255, 255, 255), 2, 8, 0);
             //}
-            cout << val << endl;
+            //cout << val << endl;
             //
             // circle(cSrc, center, radius, Scalar(255, 0, 255), 2, 8, 0);
-
             if(val < 2) {
                 drawed=true;
                 circle(src, center, radius, Scalar(255, 255, 255), 2, 8, 0);
@@ -80,12 +78,11 @@ void BallFinder::update(Mat & src) {
             }
 
         }
-        imshow("d = " + to_string(c), cSrc);
+        //imshow("d = " + to_string(c), cSrc);
         if(drawed) {
            // waitKey(10000);
         }
     }
-
     mPositionHistory.push_back(Ball{
         (roi.br() + roi.tl())*0.5,
         roi.width / 2

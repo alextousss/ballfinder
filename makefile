@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS= -Wall -ansi -pedantic -g3 -O0 -c -std=c++11  `pkg-config --cflags opencv`
-LDFLAGS= -lsfml-graphics -lsfml-window -lsfml-system  -lsfml-network  `pkg-config --libs tbb` `pkg-config --libs opencv` -pthread
+LDFLAGS= -pthread -lpthread  -lmyolinux -L /usr/local/lib/ /usr/lib/libta_lib.a -lusb-1.0 -lta_lib -lsfml-graphics -lsfml-window -lsfml-system  -lsfml-network  `pkg-config --libs tbb` `pkg-config --libs opencv` -pthread
 EXEC=ballfinder
 SRCDIR=src
 ODIR=obj
