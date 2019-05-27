@@ -13,8 +13,8 @@ Point midpoint(const Point& a, const Point& b) {
 
 
 BallGuider::BallGuider() : mStreamer({1, 2}) {
-    //namedWindow("left");
-    //namedWindow("right");
+    namedWindow("left");
+    namedWindow("right");
     mPinceShouldOpenStarted = false;
     mStartPinceShouldOpen = std::chrono::system_clock::now();
 }
@@ -127,7 +127,7 @@ void BallGuider::update() {
         << " ms" << endl;
 */
     /// Show your results
-    //imshow("left", srcLeft);
-    //imshow("right", srcRight);
+    imshow("left", srcLeft);
+    imshow("right", srcRight);
 
 }

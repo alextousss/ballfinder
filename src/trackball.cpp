@@ -78,7 +78,7 @@ void BallFinder::update(Mat & src) {
             }
 
         }
-        //imshow("d = " + to_string(c), cSrc);
+        imshow("d = " + to_string(c), cSrc);
         if(drawed) {
            // waitKey(10000);
         }
